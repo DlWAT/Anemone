@@ -3,6 +3,7 @@ import pygame
 from pygame import gfxdraw
 import random
 import numpy as np
+import math
 # activate the pygame library .  
 # initiate pygame and give permission  
 # to use pygame's functionality.  
@@ -44,24 +45,74 @@ for i in range(nbr_pts):
         globals()[f"point_{i}"]=Point()
         globals()[f"point_{i}"].x=random.randint(300,500)
         globals()[f"point_{i}"].y=random.randint(300,500) 
+x0=globals()[f"point_{0}"].x
+y0=globals()[f"point_{0}"].y
+
+x1=globals()[f"point_{1}"].x
+y1=globals()[f"point_{1}"].y
+
+x2=globals()[f"point_{2}"].x
+y2=globals()[f"point_{2}"].y
+
+air=0.5*(x1*(y2-y0)+x2*(y0-y1)+x0*(y1-y2))
+t=0
 while run:
     # creates time delay of 10ms 
-    pygame.time.delay(50)
-    
+    pygame.time.delay(10)
+    t+=0.01
+    w=3
+    mass=1
     for i in range(nbr_pts):
         totvx=0
         totvy=0
+        x0=globals()[f"point_{0}"].x
+        y0=globals()[f"point_{0}"].y
+        
+        x1=globals()[f"point_{1}"].x
+        y1=globals()[f"point_{1}"].y
+        
+        x2=globals()[f"point_{2}"].x
+        y2=globals()[f"point_{2}"].y
+        k=0.5
+        amort=1
+        force=0.1
         if i>0:
             
-            globals()[f"point_{i}"].vx=(-0.5+random.random())*1+(100-(globals()[f"point_{i}"].x-globals()[f"point_{0}"].x))*0
-            globals()[f"point_{i}"].vy=(-0.5+random.random())*1+(100-(globals()[f"point_{i}"].y-globals()[f"point_{0}"].y))*0
-            totvx=+globals()[f"point_{i}"].vx
-            totvy=+globals()[f"point_{i}"].vy
-            print(globals()[f"point_{i}"].vx,globals()[f"point_{i}"].vy)
-        globals()[f"point_{i}"].add_spd()
+            xi=globals()[f"point_{i}"].x
+            yi=globals()[f"point_{i}"].y
+            dab=np.sqrt((xi-x0)**2+(yi-y0)**2)
+            compx=(xi-x0)/dab #cos(a)
+            compy=(yi-y0)/dab #sin(a)
+            Fmuscle=dab*force*0
+            air2=0.5*(x1*(y2-y0)+x2*(y0-y1)+x0*(y1-y2))
+            diffarea=(air-air2)*0.001
+            
+            angle=0.5*(math.atan2((y2+y1)/2-y0,(x2+x1)/2-x0)-math.atan2(y0-y1,x0-x1))
+            
+            globals()[f"point_{i}"].vx+=((100-dab)*k*compx-Fmuscle*compy+np.cos(angle)*diffarea-1*amort*globals()[f"point_{i}"].vx)*0.1
+            globals()[f"point_{i}"].vy+=((100-dab)*k*compy-Fmuscle*compx+np.sin(angle)*diffarea-1*amort*globals()[f"point_{i}"].vy)*0.1
+    
+        else : 
+            for i in range(1,nbr_pts):
+                dab1=np.sqrt((x1-x0)**2+(y1-y0)**2)
+                dab2=np.sqrt((x2-x0)**2+(y2-y0)**2)
+                Fmuscle=dab2*force*1*0
+                compx1=(x0-x1)/dab1 #cos(a)
+                compy1=(y0-y1)/dab1
+                compx2=(x0-x2)/dab2 #cos(a)
+                compy2=(y0-y2)/dab2
+                
+                globals()[f"point_{0}"].vx+=(0.5*(100-dab1)*k*compx1+0.5*(100-dab2)*k*compx2-Fmuscle*compy1-amort*globals()[f"point_{0}"].vx)*0.1
+                globals()[f"point_{0}"].vy+=(0.5*(100-dab1)*k*compy2+0.5*(100-dab2)*k*compy2-Fmuscle*compx1-amort*globals()[f"point_{0}"].vy)*0.1
         
-    globals()[f"point_{0}"].vx=-totvx/nbr_pts
-    globals()[f"point_{0}"].vy=-totvy/nbr_pts
+    #globals()[f"point_{2}"].vx+=0.05*np.sin(w*t)
+    #globals()[f"point_{2}"].vy+=0.05*np.cos(w*t)
+    #globals()[f"point_{1}"].vx+=-0.05*np.sin(w*t)
+    #globals()[f"point_{1}"].vy+=-0.05*np.cos(w*t)    
+    
+    globals()[f"point_{0}"].add_spd()
+    globals()[f"point_{1}"].add_spd()
+    globals()[f"point_{2}"].add_spd()
     # iterate over the list of Event objects  
     # that was returned by pygame.event.get() method.  
     for event in pygame.event.get():
