@@ -8,6 +8,7 @@ import numpy as np
 # to use pygame's functionality.  
 pygame.init()
 
+
 # create the display surface object  
 # of specific dimension..e(500, 500).  
 win = pygame.display.set_mode((1500, 950))
