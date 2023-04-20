@@ -51,8 +51,8 @@ class Point():
 # infinite loop
 for i in range(nbr_pts):
         globals()[f"point_{i}"]=Point()
-        globals()[f"point_{i}"].x=random.randint(300,500)
-        globals()[f"point_{i}"].y=random.randint(300,500) 
+        globals()[f"point_{i}"].x=random.randint(200,400)
+        globals()[f"point_{i}"].y=random.randint(200,400) 
 x0=globals()[f"point_{0}"].x
 y0=globals()[f"point_{0}"].y
 
@@ -70,53 +70,76 @@ while run:
     t+=0.01
     w=3
     mass=1
-    for i in range(nbr_pts):
-        totvx=0
-        totvy=0
-        x0=globals()[f"point_{0}"].x
-        y0=globals()[f"point_{0}"].y
+    
+    totvx=0
+    totvy=0
+    x0=globals()[f"point_{0}"].x
+    y0=globals()[f"point_{0}"].y
+    
+    x1=globals()[f"point_{1}"].x
+    y1=globals()[f"point_{1}"].y
+    
+    x2=globals()[f"point_{2}"].x
+    y2=globals()[f"point_{2}"].y
+    k=1
+    amort=1
+    force=0.1
+    
+    dab2=np.sqrt((x2-x1)**2+(y2-y1)**2)
+    alphai=np.arccos((x2-x1)/dab2)
+    
+    
+    
+    if dab2<2*radius:
+        dab=np.sqrt((x1-x0)**2+(y1-y0)**2)
+        compx=(x1-x0)/dab #cos(a)
+        compy=(y1-y0)/dab #sin(a)
+        vtot=np.sqrt(globals()[f"point_{1}"].vx**2+globals()[f"point_{1}"].vy**2)
+        vx1=np.cos(alphai)*vtot*1
+        vy1=np.sin(alphai)*vtot*1
         
-        x1=globals()[f"point_{1}"].x
-        y1=globals()[f"point_{1}"].y
+        dab=np.sqrt((x2-x0)**2+(y2-y0)**2)
+        compx=(x2-x0)/dab #cos(a)
+        compy=(y2-y0)/dab #sin(a)
+        vtot=np.sqrt(globals()[f"point_{2}"].vx**2+globals()[f"point_{2}"].vy**2)
+        vx2=-np.cos(alphai)*vtot*1
+        vy2=-np.sin(alphai)*vtot*1
         
-        x2=globals()[f"point_{2}"].x
-        y2=globals()[f"point_{2}"].y
-        k=0.5
-        amort=1
-        force=0.1
+        dab=np.sqrt((x1-x0)**2+(y1-y0)**2)
+        compx=(x1-x0)/dab #cos(a)
+        compy=(y1-y0)/dab #sin(a)  
+        globals()[f"point_{1}"].vx+=((100-dab)*k*compx-amort*globals()[f"point_{1}"].vx+vx1)*0.1
+        globals()[f"point_{1}"].vy+=((100-dab)*k*compy-amort*globals()[f"point_{1}"].vy+vy1)*0.1
         
-        if i>0:
-            xi=globals()[f"point_{i}"].x
-            yi=globals()[f"point_{i}"].y
-            dab=np.sqrt((xi-x0)**2+(yi-y0)**2)
-            dab2=np.sqrt((x2-x1)**2+(y2-y1)**2)
-            compx=(xi-x0)/dab #cos(a)
-            compy=(yi-y0)/dab #sin(a)
-            Fmuscle=dab*force*0
-            air2=0.5*(x1*(y2-y0)+x2*(y0-y1)+x0*(y1-y2))
-            angle=0.5*(math.atan2((y2+y1)/2-y0,(x2+x1)/2-x0)-math.atan2(y0-y1,x0-x1))
-            
-            alpha=np.arcsin((yi-y0)/dab)
-            print(alpha)
-            
-            globals()[f"point_{i}"].vx+=((100-dab)*k*compx-0.25*Cx*dab*np.sin(alpha)*globals()[f"point_{i}"].vx**2)*0.1
-            globals()[f"point_{i}"].vy+=((100-dab)*k*compy-0.25*Cx*dab*np.cos(alpha)*globals()[f"point_{i}"].vy**2)*0.1
-            globals()[f"point_{0}"].vx+=(-0.25*Cx*dab*np.sin(alpha)*globals()[f"point_{0}"].vx**2)*0.1
-            globals()[f"point_{0}"].vy+=(-0.25*Cx*dab*np.cos(alpha)*globals()[f"point_{0}"].vy**2)*0.1
-            
-            #print(globals()[f"point_{i}"].vx)
-            #print(globals()[f"point_{i}"].vy)
-        else : 
-                dab1=np.sqrt((x1-x0)**2+(y1-y0)**2)
-                dab2=np.sqrt((x2-x0)**2+(y2-y0)**2)
-                Fmuscle=dab2*force*1*0
-                compx1=(x0-x1)/dab1 #cos(a)
-                compy1=(y0-y1)/dab1
-                compx2=(x0-x2)/dab2 #cos(a)
-                compy2=(y0-y2)/dab2
-                
-                globals()[f"point_{0}"].vx+=(0.5*(100-dab1)*k*compx1+0.5*(100-dab2)*k*compx2)*0.1
-                globals()[f"point_{0}"].vy+=(0.5*(100-dab1)*k*compy2+0.5*(100-dab2)*k*compy2)*0.1
+        dab=np.sqrt((x2-x0)**2+(y2-y0)**2)
+        compx=(x2-x0)/dab #cos(a)
+        compy=(y2-y0)/dab #sin(a)
+        globals()[f"point_{2}"].vx+=((100-dab)*k*compx-amort*globals()[f"point_{2}"].vx+vx2)*0.1
+        globals()[f"point_{2}"].vy+=((100-dab)*k*compy-amort*globals()[f"point_{2}"].vy+vy2)*0.1
+    
+    dab=np.sqrt((x1-x0)**2+(y1-y0)**2)
+    compx=(x1-x0)/dab #cos(a)
+    compy=(y1-y0)/dab #sin(a)  
+    globals()[f"point_{1}"].vx+=((100-dab)*k*compx-amort*globals()[f"point_{1}"].vx)*0.1
+    globals()[f"point_{1}"].vy+=((100-dab)*k*compy-amort*globals()[f"point_{1}"].vy)*0.1
+    
+    dab=np.sqrt((x2-x0)**2+(y2-y0)**2)
+    compx=(x2-x0)/dab #cos(a)
+    compy=(y2-y0)/dab #sin(a)
+    globals()[f"point_{2}"].vx+=((100-dab)*k*compx-amort*globals()[f"point_{2}"].vx)*0.1
+    globals()[f"point_{2}"].vy+=((100-dab)*k*compy-amort*globals()[f"point_{2}"].vy)*0.1
+    
+        
+    dab1=np.sqrt((x1-x0)**2+(y1-y0)**2)
+    dab2=np.sqrt((x2-x0)**2+(y2-y0)**2)
+    Fmuscle=dab2*force*1*0
+    compx1=(x0-x1)/dab1 #cos(a)
+    compy1=(y0-y1)/dab1
+    compx2=(x0-x2)/dab2 #cos(a)
+    compy2=(y0-y2)/dab2
+    
+    globals()[f"point_{0}"].vx+=((100-dab1)*k*compx1-amort*globals()[f"point_{0}"].vx)*0.1+1
+    globals()[f"point_{0}"].vy+=((100-dab1)*k*compy1-amort*globals()[f"point_{0}"].vy)*0.1
         
     #globals()[f"point_{2}"].vx+=0.05*np.sin(w*t)
     #globals()[f"point_{2}"].vy+=0.05*np.cos(w*t)

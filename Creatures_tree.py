@@ -1,3 +1,4 @@
+import time
 # class for creating binary tree (that has key(node), left(node), right(node)) 
 class TreeNode:
     def __init__(self, key):
@@ -8,7 +9,7 @@ class TreeNode:
 
 # instead of linking nodes one by one, we can represent nodes in the form of tuple
 # and we can use recursion technique to automate linking process.  
-  
+
 def parse_tuple(data):
 
     # check if the parameter passed is of type tuple and it's length is 3 (left node, key, right node)
@@ -46,7 +47,7 @@ def tree_to_tuple(node):
         return node
 
     
-tree_tuple = ((["x","y","vx","vy","weight","height","K","Strength","Freq"],3,None), 2, ((None, 3, 4), 5, (6, 7, 8)))
+tree_tuple = ((["x","y","vx","vy","weight","height","K","Strength","Freq"],["x","y","vx","vy","weight","height","K","Strength","Freq"],None), ["x","y","vx","vy","weight","height","K","Strength","Freq"], ((None, ["x","y","vx","vy","weight","height","K","Strength","Freq"], 4), 5, (6, 7, 8)))
 tree2 = parse_tuple(tree_tuple)
 print(tree_to_tuple(tree2))
 
