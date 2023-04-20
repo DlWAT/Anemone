@@ -81,19 +81,22 @@ while run:
             xi=globals()[f"point_{i}"].x
             yi=globals()[f"point_{i}"].y
             dab=np.sqrt((xi-x0)**2+(yi-y0)**2)
+            dab2=np.sqrt((x2-x1)**2+(y2-y1)**2)
             compx=(xi-x0)/dab #cos(a)
             compy=(yi-y0)/dab #sin(a)
             Fmuscle=dab*force*0
             air2=0.5*(x1*(y2-y0)+x2*(y0-y1)+x0*(y1-y2))
-            diffarea=(air-air2)*0.001
+            diffarea=(air-air2)*0.00
             
             angle=0.5*(math.atan2((y2+y1)/2-y0,(x2+x1)/2-x0)-math.atan2(y0-y1,x0-x1))
-            
-            globals()[f"point_{i}"].vx+=((100-dab)*k*compx-Fmuscle*compy+np.cos(angle)*diffarea-1*amort*globals()[f"point_{i}"].vx)*0.1
-            globals()[f"point_{i}"].vy+=((100-dab)*k*compy-Fmuscle*compx+np.sin(angle)*diffarea-1*amort*globals()[f"point_{i}"].vy)*0.1
-    
+            if dab2 > 2*radius:
+                globals()[f"point_{i}"].vx+=((100-dab)*k*compx-1*amort*globals()[f"point_{i}"].vx)*0.1
+                globals()[f"point_{i}"].vy+=((100-dab)*k*compy-1*amort*globals()[f"point_{i}"].vy)*0.1
+            else:
+                globals()[f"point_{i}"].vx+=((100-dab)*k*compx-1*amort*globals()[f"point_{i}"].vx)*0.1
+                globals()[f"point_{i}"].vy+=((100-dab)*k*compy-1*amort*globals()[f"point_{i}"].vy)*0.1
         else : 
-            for i in range(1,nbr_pts):
+            
                 dab1=np.sqrt((x1-x0)**2+(y1-y0)**2)
                 dab2=np.sqrt((x2-x0)**2+(y2-y0)**2)
                 Fmuscle=dab2*force*1*0
