@@ -30,6 +30,14 @@ vel = 1
 nbr_pts=3
 # Indicates pygame is running
 run = True
+
+Cx=0.0016
+pi = 3.1415926535
+gravity = 9.82 #m/s^2
+density_water = 1.0 #kg/m^3
+density_air   = 1.29 #kg/m^3
+drag_sphere   = 0.47
+
 class Point():
     def __init__(self) -> None:
         self.x=0
@@ -76,8 +84,8 @@ while run:
         k=0.5
         amort=1
         force=0.1
+        
         if i>0:
-            
             xi=globals()[f"point_{i}"].x
             yi=globals()[f"point_{i}"].y
             dab=np.sqrt((xi-x0)**2+(yi-y0)**2)
@@ -86,17 +94,19 @@ while run:
             compy=(yi-y0)/dab #sin(a)
             Fmuscle=dab*force*0
             air2=0.5*(x1*(y2-y0)+x2*(y0-y1)+x0*(y1-y2))
-            diffarea=(air-air2)*0.00
-            
             angle=0.5*(math.atan2((y2+y1)/2-y0,(x2+x1)/2-x0)-math.atan2(y0-y1,x0-x1))
-            if dab2 > 2*radius:
-                globals()[f"point_{i}"].vx+=((100-dab)*k*compx-1*amort*globals()[f"point_{i}"].vx)*0.1
-                globals()[f"point_{i}"].vy+=((100-dab)*k*compy-1*amort*globals()[f"point_{i}"].vy)*0.1
-            else:
-                globals()[f"point_{i}"].vx+=((100-dab)*k*compx-1*amort*globals()[f"point_{i}"].vx)*0.1
-                globals()[f"point_{i}"].vy+=((100-dab)*k*compy-1*amort*globals()[f"point_{i}"].vy)*0.1
-        else : 
             
+            alpha=np.arcsin((yi-y0)/dab)
+            print(alpha)
+            
+            globals()[f"point_{i}"].vx+=((100-dab)*k*compx-0.25*Cx*dab*np.sin(alpha)*globals()[f"point_{i}"].vx**2)*0.1
+            globals()[f"point_{i}"].vy+=((100-dab)*k*compy-0.25*Cx*dab*np.cos(alpha)*globals()[f"point_{i}"].vy**2)*0.1
+            globals()[f"point_{0}"].vx+=(-0.25*Cx*dab*np.sin(alpha)*globals()[f"point_{0}"].vx**2)*0.1
+            globals()[f"point_{0}"].vy+=(-0.25*Cx*dab*np.cos(alpha)*globals()[f"point_{0}"].vy**2)*0.1
+            
+            #print(globals()[f"point_{i}"].vx)
+            #print(globals()[f"point_{i}"].vy)
+        else : 
                 dab1=np.sqrt((x1-x0)**2+(y1-y0)**2)
                 dab2=np.sqrt((x2-x0)**2+(y2-y0)**2)
                 Fmuscle=dab2*force*1*0
@@ -105,8 +115,8 @@ while run:
                 compx2=(x0-x2)/dab2 #cos(a)
                 compy2=(y0-y2)/dab2
                 
-                globals()[f"point_{0}"].vx+=(0.5*(100-dab1)*k*compx1+0.5*(100-dab2)*k*compx2-Fmuscle*compy1-amort*globals()[f"point_{0}"].vx)*0.1
-                globals()[f"point_{0}"].vy+=(0.5*(100-dab1)*k*compy2+0.5*(100-dab2)*k*compy2-Fmuscle*compx1-amort*globals()[f"point_{0}"].vy)*0.1
+                globals()[f"point_{0}"].vx+=(0.5*(100-dab1)*k*compx1+0.5*(100-dab2)*k*compx2)*0.1
+                globals()[f"point_{0}"].vy+=(0.5*(100-dab1)*k*compy2+0.5*(100-dab2)*k*compy2)*0.1
         
     #globals()[f"point_{2}"].vx+=0.05*np.sin(w*t)
     #globals()[f"point_{2}"].vy+=0.05*np.cos(w*t)
