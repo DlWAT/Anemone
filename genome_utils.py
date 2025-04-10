@@ -1,23 +1,34 @@
 import copy
 import numpy as np
 
-def mutate_genome(genome, p_geom=0.1, p_ctrl=0.3, strength=0.1):
+def mutate_genome(genome, strength=0.1):
     g = copy.deepcopy(genome)
 
-    # Muter les positions
-    for i in range(len(g["points"])):
-        if np.random.rand() < p_geom:
-            dx, dy = np.random.randn(2) * strength
-            g["points"][i][0] += dx
-            g["points"][i][1] += dy
+    mutation_type = np.random.choice(["point", "base", "amplitude", "frequency", "phase"])
 
-    # Muter les contrôles musculaires
-    for m in g["muscles"]:
-        ctrl = m["control"]
-        if np.random.rand() < p_ctrl:
-            ctrl["base"] += np.random.randn() * 2
-            ctrl["amplitudes"] = [a + np.random.randn() * 2 for a in ctrl["amplitudes"]]
-            ctrl["frequencies"] = [max(0.05, f + np.random.randn() * 0.1) for f in ctrl["frequencies"]]
-            ctrl["phases"] = [p + np.random.randn() * 0.2 for p in ctrl["phases"]]
+    if mutation_type == "point":
+        i = np.random.randint(len(g["points"]))
+        dx, dy = np.random.randn(2) * strength
+        g["points"][i][0] += dx
+        g["points"][i][1] += dy
+
+    elif mutation_type == "base":
+        m = np.random.choice(g["muscles"])
+        m["control"]["base"] += np.random.randn() * 2
+
+    elif mutation_type == "amplitude":
+        m = np.random.choice(g["muscles"])
+        a_idx = np.random.randint(len(m["control"]["amplitudes"]))
+        m["control"]["amplitudes"][a_idx] += np.random.randn() * 2
+
+    elif mutation_type == "frequency":
+        m = np.random.choice(g["muscles"])
+        f_idx = np.random.randint(len(m["control"]["frequencies"]))
+        m["control"]["frequencies"][f_idx] = max(0.05, m["control"]["frequencies"][f_idx] + np.random.randn() * 0.1)
+
+    elif mutation_type == "phase":
+        m = np.random.choice(g["muscles"])
+        p_idx = np.random.randint(len(m["control"]["phases"]))
+        m["control"]["phases"][p_idx] += np.random.randn() * 0.2
 
     return g

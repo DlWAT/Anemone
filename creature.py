@@ -15,7 +15,7 @@ class Creature:
 
         for p in self.points:
             p.update(dt)
-            p.appliquer_frottement(dt, coef=5.0)
+            # p.appliquer_frottement(dt, coef=5.0)
 
         for lien in self.liens:
             lien.resistance_fluide()
