@@ -7,7 +7,7 @@ class Creature:
         self.muscles = muscles
         self.temps = 0
         self.energie_totale = 0.0
-        self.position_initiale = self.points[0].pos.copy()
+        self.position_initiale = np.mean([p.pos for p in self.points], axis=0)
 
     def step(self, dt):
         for muscle in self.muscles:
@@ -29,7 +29,9 @@ class Creature:
         raise NotImplementedError("Reset not implemented for genome-based Creature.")
 
     def evaluate(self):
-        dist = np.linalg.norm(self.points[0].pos - self.position_initiale)
+        position_actuelle = np.mean([p.pos for p in self.points], axis=0)
+        dist = np.linalg.norm(position_actuelle - self.position_initiale)
+
         energie = self.energie_totale + 1e-6
         penalite = 1.0 / (energie + 1e-6)  # explose quand l’énergie est trop faible
 
