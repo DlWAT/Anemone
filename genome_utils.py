@@ -4,7 +4,7 @@ import numpy as np
 def mutate_genome(genome, strength=0.1):
     g = copy.deepcopy(genome)
 
-    mutation_type = np.random.choice(["point", "amplitude", "frequency", "phase"]) # "base",
+    mutation_type = np.random.choice(["base", "amplitude", "frequency", "phase"]) # "point",
 
     if mutation_type == "point":
         i = np.random.randint(len(g["points"]))
