@@ -80,5 +80,27 @@ class Lien:
         r2 = self.p2.pos - center
         moment = np.cross(r1, f_fluide * 0.5) + np.cross(r2, -f_fluide * 0.5)
 
-        # DEBUG (tu peux désactiver si besoin)
-        # print(f"Moment ({self.i}, {self.j}) : {moment:.4f}")
+        # --- PROPULSION ACTIVE ASYMÉTRIQUE ---
+
+        # Vitesse relative entre les deux extrémités
+        v_rel = self.p2.vitesse - self.p1.vitesse
+
+        # Direction perpendiculaire (rame) dans le plan 2D
+        ortho = np.array([-direction[1], direction[0]])
+
+        # Composante perpendiculaire de la vitesse relative (effet de rame)
+        v_proj = np.dot(v_rel, ortho)
+
+        # Force de propulsion : asymétrique selon le sens de poussée
+        k_propulsion = 0.2  # à ajuster selon ton échelle de vitesses
+        if v_proj > 0:
+            f_prop = -ortho * v_proj * k_propulsion  # poussée dans un sens
+        else:
+            f_prop = -ortho * v_proj * k_propulsion * 0.5  # moins efficace dans l’autre
+
+        # Appliquer la poussée aux deux extrémités
+        self.p1.appliquer_force(+0.5 * f_prop)
+        self.p2.appliquer_force(-0.5 * f_prop)
+
+        # DEBUG (optionnel)
+        # print(f"Propulsion ({self.i}, {self.j}) : {f_prop}")
