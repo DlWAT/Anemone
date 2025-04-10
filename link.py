@@ -1,9 +1,20 @@
 import numpy as np
 
 class Lien:
-    def __init__(self, p1, p2, longueur_repos=None, intensite=1.0):
+    def __init__(self, p1, p2, i=None, j=None, longueur_repos=None, intensite=1.0):
+        """
+        Lien entre deux points avec option de stockage des indices (i, j)
+        :param p1: premier point
+        :param p2: deuxième point
+        :param i: index du point p1 dans la liste des points (optionnel)
+        :param j: index du point p2 dans la liste des points (optionnel)
+        :param longueur_repos: longueur au repos du lien
+        :param intensite: raideur du lien
+        """
         self.p1 = p1
         self.p2 = p2
+        self.i = i
+        self.j = j
         self.longueur_repos = longueur_repos or np.linalg.norm(p2.pos - p1.pos)
         self.intensite = intensite
 

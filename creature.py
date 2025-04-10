@@ -15,6 +15,7 @@ class Creature:
 
         for p in self.points:
             p.update(dt)
+            p.appliquer_frottement(dt, coef=5.0)
 
         for lien in self.liens:
             lien.resistance_fluide()
@@ -30,3 +31,6 @@ class Creature:
     def evaluate(self):
         dist = np.linalg.norm(self.points[0].pos - self.position_initiale)
         return dist / (self.energie_totale + 1e-6)
+
+    def get_positions(self):
+            return np.array([p.pos for p in self.points])

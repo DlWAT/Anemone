@@ -18,3 +18,7 @@ class Point:
             self.vitesse = self.vitesse / speed * vmax
         self.pos += self.vitesse * dt
         self.force[:] = 0.0
+        
+    def appliquer_frottement(self, dt, coef=5.0):
+        self.vitesse -= coef * self.vitesse * dt
+

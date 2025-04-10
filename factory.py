@@ -20,7 +20,7 @@ def make_angle_func(control):
 
 def genome_to_creature(genome):
     points = [Point(x, y) for x, y in genome["points"]]
-    liens = [Lien(points[i], points[j]) for i, j in genome["liens"]]
+    liens = [Lien(points[i], points[j], i=i, j=j) for i, j in genome["liens"]]  # <-- CORRIGÉ ICI
 
     muscles = []
     for m in genome["muscles"]:
