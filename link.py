@@ -43,6 +43,16 @@ class Lien:
         if np.dot(v_para, direction) < 0:
             k_para *= 3  # freinage asymétrique
 
-        f_fluide = -k_para * v_para - k_perp * v_perp
+        v_global = 0.5 * (self.p1.vitesse + self.p2.vitesse)
+        norm_vg = np.linalg.norm(v_global)
+
+        if norm_vg > 1e-6:
+            v_dir = v_global / norm_vg
+            alignement = abs(np.dot(v_dir, direction))  # proche de 1 si bien aligné
+            k_perp_eff = k_perp * (1 - 0.7 * alignement**2)  # moins de résistance si bien profilé
+        else:
+            k_perp_eff = k_perp
+
+        f_fluide = -k_para * v_para - k_perp_eff * v_perp
         self.p1.appliquer_force(f_fluide * 0.5)
         self.p2.appliquer_force(f_fluide * 0.5)
