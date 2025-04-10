@@ -30,7 +30,11 @@ class Creature:
 
     def evaluate(self):
         dist = np.linalg.norm(self.points[0].pos - self.position_initiale)
-        return dist / (self.energie_totale + 1e-6)
+        energie = self.energie_totale + 1e-6
+        penalite = 1.0 / (energie + 1e-6)  # explose quand l’énergie est trop faible
+
+        return dist / (energie + 0.1 * penalite)
+
 
     def get_positions(self):
             return np.array([p.pos for p in self.points])
