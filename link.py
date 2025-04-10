@@ -1,7 +1,7 @@
 import numpy as np
 
 class Lien:
-    def __init__(self, p1, p2, i=None, j=None, longueur_repos=None, intensite=1.0):
+    def __init__(self, p1, p2, i=None, j=None, longueur_repos=None, intensite=2.0):
         """
         Lien entre deux points avec option de stockage des indices (i, j)
         :param p1: premier point

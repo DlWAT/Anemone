@@ -25,9 +25,9 @@ minimal_genome = {
 }
 
 n = 150
-dt = 0.002
+dt = 0.0002
 steps = 1000
-generations = 200
+generations = 500
 keep_fraction = 0.1
 mutation_strength = 0.01
 
