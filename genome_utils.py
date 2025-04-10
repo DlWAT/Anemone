@@ -3,6 +3,9 @@ from point import Point
 from link import Lien
 from muscle import Muscle
 from creature import Creature
+import copy
+import random
+
 
 def sinus_sum_func(freqs, amps, phases):
     def omega_func(t):
@@ -33,3 +36,15 @@ def genome_to_creature(genome):
         muscles.append(muscle)
 
     return Creature(points, liens, muscles)
+
+def mutate_genome(genome, mutation_strength=0.1):
+    new_genome = copy.deepcopy(genome)
+
+    for m in new_genome["muscles"]:
+        # Mutation légère des fréquences, amplitudes, phases
+        m["freqs"] = [max(0.05, f + random.gauss(0, mutation_strength)) for f in m.get("freqs", [1.0])]
+        m["amps"] = [max(0.0, a + random.gauss(0, mutation_strength)) for a in m.get("amps", [1.0])]
+        m["phases"] = [(p + random.gauss(0, mutation_strength)) % (2 * np.pi) for p in m.get("phases", [0.0])]
+        m["intensite"] = max(0.1, m.get("intensite", 10.0) + random.gauss(0, mutation_strength * 5))
+
+    return new_genome
