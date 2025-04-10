@@ -24,13 +24,14 @@ class Lien:
             return
         direction = delta / distance
         v_moy = 0.5 * (self.p1.vitesse + self.p2.vitesse)
-
-        v_para = -np.dot(v_moy, direction) * direction
-        v_perp = v_moy - v_para
+        v_para = np.dot(v_moy, direction) * direction
+        v_perp = -(v_moy - v_para)
 
         k_para = 0.01
         k_perp = 0.5
-        f_fluide = -k_para * v_para - k_perp * v_perp
+        if np.dot(v_para, direction) < 0:
+            k_para *= 3  # freinage asymétrique
 
+        f_fluide = -k_para * v_para - k_perp * v_perp
         self.p1.appliquer_force(f_fluide * 0.5)
         self.p2.appliquer_force(f_fluide * 0.5)
