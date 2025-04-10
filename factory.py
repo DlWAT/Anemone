@@ -4,28 +4,22 @@ from link import Lien
 from muscle import Muscle
 from creature import Creature
 
-def make_angle_func(control):
-    base = control["base"]
-    amps = control["amplitudes"]
-    freqs = control["frequencies"]
-    phases = control["phases"]
-
-    def angle_func(t):
-        total = base
-        for a, f, p in zip(amps, freqs, phases):
-            total += a * np.sin(2 * np.pi * f * t + p)
-        return np.radians(np.clip(total, 10, 170))
-
-    return angle_func
+def sinus_sum_func(freqs, amps, phases):
+    def omega_func(t):
+        return sum(a * np.sin(2 * np.pi * f * t + p) for a, f, p in zip(amps, freqs, phases))
+    return omega_func
 
 def genome_to_creature(genome):
     points = [Point(x, y) for x, y in genome["points"]]
-    liens = [Lien(points[i], points[j], i=i, j=j) for i, j in genome["liens"]]  # <-- CORRIGÉ ICI
+    liens = [Lien(points[i], points[j], i=i, j=j) for i, j in genome["links"]]
 
     muscles = []
     for m in genome["muscles"]:
-        i, j, k = m["points"]
-        angle_func = make_angle_func(m["control"])
-        muscles.append(Muscle(points[i], points[j], points[k], angle_func, rigidite=50, amortissement=10))
+        i, j, k = m["p0"], m["p1"], m["p2"]
+        freqs = m.get("freqs", [1.0])
+        amps = m.get("amps", [1.0])
+        phases = m.get("phases", [0.0])
+        omega_func = sinus_sum_func(freqs, amps, phases)
+        muscles.append(Muscle(points[i], points[j], points[k], omega_func, intensite=10.0))
 
     return Creature(points, liens, muscles)

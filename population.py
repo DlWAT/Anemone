@@ -1,12 +1,11 @@
 import numpy as np
-from creature import Creature
-from utils import random_angle_function
+from factory import genome_to_creature
 
 class Population:
-    def __init__(self, size=10):
-        self.size = size
-        self.creatures = [Creature(random_angle_function()) for _ in range(size)]
-        self.scores = np.zeros(size)
+    def __init__(self, genomes):
+        self.genomes = genomes
+        self.creatures = [genome_to_creature(g) for g in genomes]
+        self.scores = np.zeros(len(self.creatures))
 
     def simulate(self, dt=0.02, steps=1000):
         self.trajectoires = [[] for _ in self.creatures]
@@ -15,7 +14,7 @@ class Population:
         for step in range(steps):
             for i, c in enumerate(self.creatures):
                 c.step(dt)
-                self.trajectoires[i].append(c.p0.pos.copy())
+                self.trajectoires[i].append(c.points[0].pos.copy())
                 self.etats[i].append([p.pos.copy() for p in c.points])
 
         self.scores = np.array([c.evaluate() for c in self.creatures])
@@ -24,17 +23,4 @@ class Population:
 
     def select_best(self, top_k=5):
         indices = np.argsort(self.scores)[::-1]
-        return [self.creatures[i] for i in indices[:top_k]]
-
-    def next_generation(self, mutation_strength=0.1):
-        top = self.select_best(top_k=self.size // 2)
-        new_creatures = []
-        for creature in top:
-            for _ in range(2):  # deux enfants par parent
-                mutated_func = self.mutate_func(creature.angle_func, mutation_strength)
-                new_creatures.append(Creature(mutated_func))
-        self.creatures = new_creatures[:self.size]
-
-    def mutate_func(self, angle_func, strength):
-        """Crée une nouvelle fonction en perturbant les coefficients de l’ancienne."""
-        return random_angle_function()  # TODO : réutiliser + muter les anciens paramètres
+        return [self.genomes[i] for i in indices[:top_k]]
