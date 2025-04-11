@@ -8,27 +8,14 @@ from tqdm import tqdm
 from concurrent.futures import ProcessPoolExecutor
 
 # === Paramètres de simulation ===
-minimal_genome = {
-    "points": [[0, 0], [1, 0], [2, 1]],
-    "links": [(0, 1), (1, 2)],
-    "muscles": [
-        {
-            "p0": 0,
-            "p1": 1,
-            "p2": 2,
-            "freqs": [0.5, 0.25],
-            "amps": [1.5, 0.7],
-            "phases": [0.0, 1.0],
-            "intensite": 10.0
-        }
-    ]
-}
+with open("best_genome_last_generation.json", "r") as f:
+    minimal_genome = json.load(f)
 
-n = 200
+n = 1000
 dt = 0.01
-steps = 500
+steps = 1000
 generations = 20
-keep_fraction = 0.25
+keep_fraction = 0.01
 mutation_strength = 0.01
 
 def simulate_creature_from_genome(genome):
