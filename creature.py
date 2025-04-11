@@ -32,7 +32,7 @@ class Creature:
         dist = np.linalg.norm(position_actuelle - self.position_initiale)
         energie = self.energie_totale + 1e-6
         penalite = 1.0 / (energie + 1e-6)
-        return dist**2 / (energie + 0.1 * penalite)
+        return dist / (energie )#+ 0.1 * penalite)
 
     def get_positions(self):
         return np.array([p.pos for p in self.points])
