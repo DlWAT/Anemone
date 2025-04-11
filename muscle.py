@@ -40,8 +40,8 @@ def interaction_hydrodynamique_triangle(p0, p1, p2, k_interaction=0.3, angle_seu
     cos_angle = np.dot(r0, r2) / (norm_r0 * norm_r2)
     angle = np.arccos(np.clip(cos_angle, -1.0, 1.0))
 
-    if angle > np.radians(angle_seuil_deg):
-        return  # angle trop large : pas d'interaction
+    # if angle > np.radians(angle_seuil_deg):
+    #     return  # angle trop large : pas d'interaction
 
     aire = 0.5 * np.abs(np.cross(r0, r2))
     v0 = p0.v - p1.v

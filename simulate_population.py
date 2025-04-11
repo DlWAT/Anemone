@@ -24,7 +24,7 @@ minimal_genome = {
     ]
 }
 
-n = 2000
+n = 200
 dt = 0.01
 steps = 500
 generations = 20
