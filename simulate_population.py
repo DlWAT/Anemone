@@ -11,10 +11,10 @@ from concurrent.futures import ProcessPoolExecutor
 with open("best_genome_last_generation.json", "r") as f:
     minimal_genome = json.load(f)
 
-n = 10000
+n = 1000
 dt = 0.01
 steps = 1000
-generations = 50
+generations = 10
 keep_fraction = 0.01
 mutation_strength = 0.05
 
