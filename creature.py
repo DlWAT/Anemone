@@ -1,4 +1,5 @@
 import numpy as np
+from muscle import interaction_hydrodynamique_triangle
 
 class Creature:
     def __init__(self, points, liens, muscles):
@@ -12,8 +13,13 @@ class Creature:
     def step(self, dt):
         for muscle in self.muscles:
             muscle.update(self.temps)
+
+        for muscle in self.muscles:
+            interaction_hydrodynamique_triangle(muscle.p0, muscle.p1, muscle.p2)
+
         for lien in self.liens:
             lien.appliquer_forces()
+
         for point in self.points:
             point.update(dt)
 

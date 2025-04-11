@@ -19,7 +19,8 @@ def genome_to_creature(genome):
         freqs = m.get("freqs", [1.0])
         amps = m.get("amps", [1.0])
         phases = m.get("phases", [0.0])
+        intensite = m.get("intensite", 10.0)
         omega_func = sinus_sum_func(freqs, amps, phases)
-        muscles.append(Muscle(points[i], points[j], points[k], omega_func, intensite=10.0))
+        muscles.append(Muscle(points[i], points[j], points[k], omega_func, intensite))
 
     return Creature(points, liens, muscles)

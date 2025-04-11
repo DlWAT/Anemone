@@ -7,7 +7,7 @@ from evolution import evolve_population
 from tqdm import tqdm
 from concurrent.futures import ProcessPoolExecutor
 
-# ==== Paramètres de simulation ====
+# === Paramètres de simulation ===
 minimal_genome = {
     "points": [[0, 0], [1, 0], [2, 1]],
     "links": [(0, 1), (1, 2)],
@@ -25,11 +25,11 @@ minimal_genome = {
 }
 
 n = 100
-dt = 0.01
-steps = 2000
-generations = 200
-keep_fraction = 0.01
-mutation_strength = 0.1
+dt = 0.0002
+steps = 10000
+generations = 20
+keep_fraction = 0.1
+mutation_strength = 0.01
 
 def simulate_creature_from_genome(genome):
     creature = genome_to_creature(genome)
@@ -73,7 +73,7 @@ if __name__ == "__main__":
 
         moyennes.append(moyenne)
 
-    # Affichage du graphe
+    # === Affichage
     plt.figure()
     plt.plot(moyennes, 'o-', label="Score moyen")
     plt.xlabel("Génération")
@@ -85,7 +85,7 @@ if __name__ == "__main__":
     plt.savefig("performance_par_generation.png", dpi=300)
     plt.show()
 
-    # Sauvegarde des génomes
+    # === Sauvegarde des génomes
     with open("worst_genome_all_time.json", "w") as f:
         json.dump(worst_genome, f, indent=2)
     with open("best_genome_last_generation.json", "w") as f:
