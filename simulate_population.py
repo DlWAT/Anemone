@@ -11,12 +11,12 @@ from concurrent.futures import ProcessPoolExecutor
 with open("best_genome_last_generation.json", "r") as f:
     minimal_genome = json.load(f)
 
-n = 1000
+n = 10000
 dt = 0.01
 steps = 1000
-generations = 20
+generations = 50
 keep_fraction = 0.01
-mutation_strength = 0.01
+mutation_strength = 0.05
 
 def simulate_creature_from_genome(genome):
     creature = genome_to_creature(genome)
@@ -66,6 +66,7 @@ if __name__ == "__main__":
     plt.xlabel("Génération")
     plt.ylabel("Score (distance / énergie)")
     plt.title("Performance moyenne par génération")
+    plt.ylim(0, max(moyennes) * 1.1)
     plt.grid()
     plt.legend()
     plt.tight_layout()

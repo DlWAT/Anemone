@@ -5,17 +5,17 @@ import numpy as np
 def mutate_genome(genome, mutation_strength=0.1):
     new_genome = copy.deepcopy(genome)
 
-    # === Mutation position points 0 et 2 (autour de p1) ===
-    if "points" in new_genome and len(new_genome["points"]) >= 3:
-        p1 = np.array(new_genome["points"][1])
-        l1 = np.linalg.norm(np.array(new_genome["points"][0]) - p1)
-        l2 = np.linalg.norm(np.array(new_genome["points"][2]) - p1)
+    # # === Mutation position points 0 et 2 (autour de p1) ===
+    # if "points" in new_genome and len(new_genome["points"]) >= 3:
+    #     p1 = np.array(new_genome["points"][1])
+    #     l1 = np.linalg.norm(np.array(new_genome["points"][0]) - p1)
+    #     l2 = np.linalg.norm(np.array(new_genome["points"][2]) - p1)
 
-        theta0 = random.uniform(0, 2 * np.pi)
-        theta2 = random.uniform(0, 2 * np.pi)
+    #     theta0 = random.uniform(0, 2 * np.pi)
+    #     theta2 = random.uniform(0, 2 * np.pi)
 
-        new_genome["points"][0] = (p1 + l1 * np.array([np.cos(theta0), np.sin(theta0)])).tolist()
-        new_genome["points"][2] = (p1 + l2 * np.array([np.cos(theta2), np.sin(theta2)])).tolist()
+    #     new_genome["points"][0] = (p1 + l1 * np.array([np.cos(theta0), np.sin(theta0)])).tolist()
+    #     new_genome["points"][2] = (p1 + l2 * np.array([np.cos(theta2), np.sin(theta2)])).tolist()
 
     # === Mutation des muscles (une seule mutation par muscle) ===
     for m in new_genome.get("muscles", []):
