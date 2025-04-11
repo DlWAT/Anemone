@@ -24,12 +24,12 @@ minimal_genome = {
     ]
 }
 
-n = 200
+n = 100
 dt = 0.01
-steps = 5000
-generations = 2000
-keep_fraction = 0.1
-mutation_strength = 0.05
+steps = 2000
+generations = 200
+keep_fraction = 0.01
+mutation_strength = 0.1
 
 def simulate_creature_from_genome(genome):
     creature = genome_to_creature(genome)
