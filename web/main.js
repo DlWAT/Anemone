@@ -59,6 +59,33 @@ const worker = new Worker(new URL('./worker.js', import.meta.url), { type: 'modu
 let gaRunning = false;
 log('Worker cree');
 
+function downloadJson(filename, data) {
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
+function applyCfgToInputs(nextCfg) {
+  if (!nextCfg) return;
+  if (Number.isFinite(nextCfg.popSize)) byId('popSize').value = String(nextCfg.popSize);
+  if (Number.isFinite(nextCfg.steps)) byId('simSteps').value = String(nextCfg.steps);
+  if (Number.isFinite(nextCfg.mutationStrength)) byId('mutStrength').value = String(nextCfg.mutationStrength);
+  if (Number.isFinite(nextCfg.evalWorkers)) byId('evalWorkers').value = String(nextCfg.evalWorkers);
+}
+
+const hwThreads = (typeof navigator !== 'undefined' && Number.isFinite(navigator.hardwareConcurrency))
+  ? navigator.hardwareConcurrency
+  : 0;
+if (hwThreads > 0) {
+  byId('evalWorkers').value = String(Math.max(1, hwThreads));
+}
+
 worker.onerror = (err) => {
   byId('gaState').textContent = 'Erreur worker';
   log('Erreur worker: ' + (err.message || 'inconnue'));
@@ -86,12 +113,42 @@ worker.onmessage = (e) => {
       byId('gridTitle').textContent = `Top 40 — population (${m.speciesCount || 0}/${m.speciesCap || 0} espèces, brut ${m.speciesCountRaw || 0})`;
     }
     if (m.generation % 5 === 0) {
-      log('Generation ' + m.generation + ' best=' + m.best.toFixed(4) + ' species=' + (m.speciesCount || 0));
+      log('Generation ' + m.generation + ' best=' + m.best.toFixed(4) + ' species=' + (m.speciesCount || 0) + ' workers=' + (m.evalWorkers || 1));
     }
     if (followBest) {
       currentGenome = m.bestGenome;
       big.setGenome(currentGenome);
     }
+  } else if (m.type === 'snapshot') {
+    const snap = m.snapshot || {};
+    const gen = Number.isFinite(snap.generation) ? snap.generation : 0;
+    const stamp = new Date().toISOString().replace(/[:.]/g, '-');
+    downloadJson(`evolve-save-g${gen}-${stamp}.json`, snap);
+    byId('gaState').textContent = `Sauvegarde gen ${gen} exportee`;
+    log('Snapshot exporte generation=' + gen);
+  } else if (m.type === 'import_ack') {
+    gaRunning = false;
+    applyCfgToInputs(m.cfg);
+    byId('gen').textContent = m.generation;
+    byId('best').textContent = Number(m.best || 0).toFixed(4);
+    byId('mean').textContent = Number(m.mean || 0).toFixed(4);
+    byId('gaState').textContent = `Sauvegarde chargee (gen ${m.generation})`;
+    byId('gridTitle').textContent = 'Top 40 — population';
+    setGridModePopulation();
+    selectedSpeciesId = null;
+    chart.setHistory(Array.isArray(m.history) ? m.history : []);
+    lastTopGenomes = m.topGenomes || [];
+    lastSpeciesBest = m.speciesBest || [];
+    renderSpeciesList(lastSpeciesBest);
+    grid.setGenomes(lastTopGenomes.length ? lastTopGenomes : Array.from({ length: 24 }, () => randomGenome()));
+    if (followBest && lastTopGenomes.length) {
+      currentGenome = lastTopGenomes[0].genome;
+      big.setGenome(currentGenome);
+    }
+    log('Snapshot importe generation=' + m.generation);
+  } else if (m.type === 'error') {
+    byId('gaState').textContent = 'Erreur import/sauvegarde';
+    log('Erreur worker: ' + (m.message || 'inconnue'));
   }
 };
 
@@ -184,6 +241,7 @@ byId('btnGAStart').onclick = () => {
       popSize: parseInt(byId('popSize').value),
       steps: parseInt(byId('simSteps').value),
       mutationStrength: parseFloat(byId('mutStrength').value),
+      evalWorkers: parseInt(byId('evalWorkers').value, 10),
     },
   });
   log('Click btnGAStart');
@@ -224,6 +282,28 @@ byId('btnGAReset').onclick = () => {
   lastTopGenomes = [];
   lastSpeciesBest = [];
   log('Click btnGAReset');
+};
+byId('btnGASave').onclick = () => {
+  worker.postMessage({ type: 'snapshot' });
+  byId('gaState').textContent = 'Export sauvegarde...';
+  log('Click btnGASave');
+};
+byId('fileGALoad').onchange = async (e) => {
+  const file = e.target.files && e.target.files[0];
+  e.target.value = '';
+  if (!file) return;
+  try {
+    const text = await file.text();
+    const snapshot = JSON.parse(text);
+    gaRunning = false;
+    worker.postMessage({ type: 'pause' });
+    worker.postMessage({ type: 'import', snapshot });
+    byId('gaState').textContent = 'Import sauvegarde...';
+    log('Import demande depuis fichier: ' + file.name);
+  } catch (err) {
+    byId('gaState').textContent = 'Fichier de sauvegarde invalide';
+    log('Import impossible: ' + (err.message || err));
+  }
 };
 
 // ----- Boucle de rendu
