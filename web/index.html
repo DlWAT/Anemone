@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Evolve — créatures aquatiques évolutives</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <h1>Evolve <span class="sub">soft-body GA dans le navigateur</span></h1>
+  <div class="stats">
+    <span>gen <b id="gen">0</b></span>
+    <span>best <b id="best">—</b></span>
+    <span>mean <b id="mean">—</b></span>
+    <span>GA: <b id="gaState">arrêté</b></span>
+  </div>
+</header>
+
+<main>
+
+  <section class="big-pane">
+    <canvas id="big"></canvas>
+
+    <div class="overlay-controls">
+      <button id="btnPlay">⏸ Pause</button>
+      <button id="btnReset">↺ Reset</button>
+      <button id="btnRand">🎲 Random</button>
+      <label>vitesse <input id="speed" type="range" min="1" max="10" value="1"><span id="speedVal">1×</span></label>
+      <label><input type="checkbox" id="toggleField"> champ</label>
+      <label><input type="checkbox" id="toggleForces"> forces</label>
+      <label><input type="checkbox" id="toggleFollow" checked> suivre</label>
+      <label><input type="checkbox" id="toggleBest" checked> afficher best GA</label>
+    </div>
+  </section>
+
+  <aside class="side">
+
+    <div class="card card-ga">
+      <h2>Algorithme génétique</h2>
+      <div class="row">
+        <label>population <input id="popSize" type="number" value="80" min="10" max="400"></label>
+        <label>steps/eval <input id="simSteps" type="number" value="800" min="100" max="3000"></label>
+      </div>
+      <div class="row">
+        <label>mutation <input id="mutStrength" type="number" step="0.01" value="0.10" min="0" max="1"></label>
+      </div>
+      <div class="row">
+        <button id="btnGAStart">▶ Démarrer</button>
+        <button id="btnGAPause">⏸ Pause</button>
+        <button id="btnGAReset">↺ Reset</button>
+      </div>
+    </div>
+
+    <div class="card card-chart">
+      <h2>Fitness (distance² / énergie)</h2>
+      <canvas id="chart"></canvas>
+    </div>
+
+    <div class="card card-grid">
+      <h2 id="gridTitle">Top 40 — population</h2>
+      <div id="gridScroll" class="grid-scroll">
+        <canvas id="grid"></canvas>
+      </div>
+    </div>
+
+    <div class="card card-species">
+      <h2>Best par espèce (arbre)</h2>
+      <div id="speciesList" class="species-list"></div>
+    </div>
+
+    <div class="card card-logs">
+      <h2>Logs debug</h2>
+      <div id="logPanel" class="log-panel"></div>
+    </div>
+
+  </aside>
+
+</main>
+
+<footer>
+  <p>Verlet + PBD · drag anisotrope (C⊥/C∥ = <span id="cratio">22.5</span>) · masse ajoutée fluide ·
+     évolution dans Web Worker · canvas 2D natif</p>
+</footer>
+
+<script>
+  (function () {
+    function append(msg) {
+      var panel = document.getElementById('logPanel');
+      if (!panel) return;
+      var line = document.createElement('div');
+      line.textContent = '[' + new Date().toLocaleTimeString() + '] ' + msg;
+      panel.appendChild(line);
+      panel.scrollTop = panel.scrollHeight;
+    }
+    window.__evolveBootLog = append;
+    window.__evolveMainStarted = false;
+    append('Boot script OK');
+
+    setTimeout(function () {
+      if (!window.__evolveMainStarted) {
+        append('WARN: main.js non initialise (erreur module probable)');
+      }
+    }, 1200);
+
+    document.addEventListener('click', function (e) {
+      var t = e.target;
+      if (t && (t.tagName === 'BUTTON' || (t.tagName === 'INPUT' && (t.type === 'checkbox' || t.type === 'range')))) {
+        var id = t.id || '(sans id)';
+        append('UI click: #' + id);
+      }
+    }, true);
+
+    document.addEventListener('change', function (e) {
+      var t = e.target;
+      if (t && t.id) {
+        var val = (t.type === 'checkbox') ? String(t.checked) : String(t.value);
+        append('UI change: #' + t.id + '=' + val);
+      }
+    }, true);
+
+    window.addEventListener('error', function (e) {
+      append('ERROR: ' + (e.message || 'runtime error'));
+    });
+    window.addEventListener('unhandledrejection', function (e) {
+      var reason = e && e.reason ? (e.reason.message || String(e.reason)) : 'unknown rejection';
+      append('PROMISE ERROR: ' + reason);
+    });
+  })();
+</script>
+<script type="module">
+  import('./main.js').catch((err) => {
+    const msg = err && err.message ? err.message : String(err);
+    if (window.__evolveBootLog) window.__evolveBootLog('IMPORT ERROR main.js: ' + msg);
+    console.error('IMPORT ERROR main.js', err);
+  });
+</script>
+</body>
+</html>
